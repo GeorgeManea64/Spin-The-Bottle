@@ -3,18 +3,49 @@ body {
     text-align: center;
     margin-top: 50px;
 }
+#canvas-container {
+    position: relative;
+    margin: 20px auto;
+    width: 400px;
+    height: 400px;
+}
+canvas {
+    border: 10px solid #333;
+    border-radius: 50%;
+}
+#arrow {
+    position: absolute;
+    top: 52%;
+    left: 52%;
+    border: solid black 2.5px;
+    width: 5px;
+    height: 125px;
+    background: red;
+    transform: translate(-50%, -100%);
+    transform-origin: bottom center;
+    z-index: 10;
+}
+#center-pin {
+    position: absolute;
+    top: 52%;
+    left: 52%;
+    width: 20px;
+    height: 20px;
+    background: black;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 15;
+}
+#status {
+    margin-top: 20px;
+    font-size: 18px;
+}
 ul {
     list-style-type: none;
     padding: 0;
 }
 li {
     margin: 5px 0;
-}
-#spin {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
 }
 form {
     margin-top: 20px;
@@ -24,14 +55,8 @@ input {
     font-size: 14px;
     margin-right: 10px;
 }
-#add-player {
+#add-player, #spin {
     padding: 10px 20px;
     font-size: 14px;
     cursor: pointer;
-}
-#rolling-names {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    height: 30px;
 }

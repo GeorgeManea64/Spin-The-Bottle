@@ -1,62 +1,99 @@
-const statusElement = document.getElementById('status');
+const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spin');
+        const statusText = document.getElementById('status');
         const playersList = document.getElementById('players');
         const playerForm = document.getElementById('player-form');
         const playerNameInput = document.getElementById('player-name');
-        const rollingNamesElement = document.getElementById('rolling-names');
 
-        document.getElementById('spin').addEventListener('click', function() {
-            const players = Array.from(document.querySelectorAll('#players li'));
+        let players = [];
+        let angleOffset = 0;
 
+        function drawWheel(players, angle = 0) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const sliceAngle = (2 * Math.PI) / players.length;
+
+            players.forEach((player, i) => {
+                const start = angle + i * sliceAngle;
+                const end = start + sliceAngle;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, start, end);
+                ctx.closePath();
+
+                ctx.fillStyle = `hsl(${(i * 360) / players.length}, 80%, 60%)`;
+                ctx.fill();
+                ctx.stroke();
+
+                const textAngle = start + sliceAngle / 2;
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(textAngle);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "black";
+                ctx.font = "bold 14px Arial";
+                ctx.fillText(player, radius - 10, 5);
+                ctx.restore();
+            });
+        }
+
+        function spinWheel() {
             if (players.length === 0) {
-                statusElement.textContent = 'No players to spin the bottle!';
+                statusText.textContent = "No players to spin the bottle!";
                 return;
             }
 
-            statusElement.textContent = 'Spinning...';
+            const sliceAngle = (2 * Math.PI) / players.length;
+            const randomIndex = Math.floor(Math.random() * players.length);
+            const stopAngle = (3 * Math.PI / 2) - (randomIndex * sliceAngle) - (sliceAngle / 2);
+            const rotations = 5 * 2 * Math.PI;
+            const finalAngle = rotations + stopAngle;
+            const duration = 5000;
+            const start = performance.now();
 
-            let index = 0;
-            let delay = 50;
-            let spinCount = 0;
-            let maxSpins = 50; 
-            const chosenIndex = Math.floor(Math.random() * players.length);
+            function animate(timestamp) {
+                const elapsed = timestamp - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                angleOffset = finalAngle * eased;
+                drawWheel(players, angleOffset);
 
-            function spinNames() {
-                rollingNamesElement.textContent = players[index % players.length].textContent;
-                index++;
-                spinCount++;
-
-                if (spinCount < maxSpins) {
-                    setTimeout(spinNames, delay);
-                    delay += 15; // gradually increase delay to slow down
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
                 } else {
-                    const chosenPlayer = players[chosenIndex].textContent;
-                    rollingNamesElement.textContent = chosenPlayer;
-                    statusElement.textContent = `The bottle points to: ${chosenPlayer}`;
+                    statusText.textContent = `Chosen: ${players[randomIndex]}`;
                 }
             }
 
-            spinNames();
-        });
+            statusText.textContent = "Spinning...";
+            requestAnimationFrame(animate);
+        }
 
-        playerForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const newPlayerName = playerNameInput.value.trim();
+        spinBtn.addEventListener('click', spinWheel);
 
-            if (!newPlayerName) {
-                statusElement.textContent = 'Player name cannot be empty!';
+        playerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                statusText.textContent = "Player name cannot be empty!";
                 return;
             }
-
-            const existingPlayers = Array.from(document.querySelectorAll('#players li'));
-            if (existingPlayers.some(player => player.textContent === newPlayerName)) {
-                statusElement.textContent = 'Player already exists!';
+            if (players.includes(name)) {
+                statusText.textContent = "Player already exists!";
                 return;
             }
-
-            const newPlayerItem = document.createElement('li');
-            newPlayerItem.textContent = newPlayerName;
-            playersList.appendChild(newPlayerItem);
-
+            players.push(name);
+            const li = document.createElement('li');
+            li.textContent = name;
+            playersList.appendChild(li);
             playerNameInput.value = '';
-            statusElement.textContent = `Player ${newPlayerName} added!`;
+            statusText.textContent = `Player ${name} added!`;
+            drawWheel(players);
         });
+
+        drawWheel(players);

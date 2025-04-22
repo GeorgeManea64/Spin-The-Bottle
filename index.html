@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Spin the Bottle</h1>
+    
+    <h1>Spin The Bottle</h1>
     <p id="players-text">Players</p>
     <ul id="players"></ul>
-    <p id="status">Spin the bottle!</p>
+    <p id="status">Add players to spin the bottle.</p>
 
     <form id="player-form">
         <label for="player-name">Enter player name:</label>
@@ -20,7 +21,11 @@
 
     <button id="spin">Spin</button>
 
-    <p id="rolling-names"></p>
+    <div id="canvas-container">
+        <canvas id="wheel" width="400" height="400"></canvas>
+        <div id="arrow"></div>
+        <div id="center-pin"></div>
+    </div>
     
     <script src="script.js"></script>
     
